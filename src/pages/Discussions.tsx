@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Search, MessageSquare, X } from 'lucide-react';
+import { Search, MessageSquare, X, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
 import { mockDiscussions, mockBooks } from '../data/mockData';
@@ -51,6 +51,16 @@ const Discussions = () => {
     setCurrentPage(1);
   };
 
+  const setBookFilter = (bookId: string) => {
+    setSearchParams({ bookId });
+    setCurrentPage(1);
+  };
+
+  // Get unique books that have discussions
+  const booksWithDiscussions = mockBooks.filter(book => 
+    mockDiscussions.some(discussion => discussion.bookId === book.id)
+  );
+
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
@@ -85,6 +95,35 @@ const Discussions = () => {
               </div>
             </div>
           )}
+
+          {/* Book Filter Buttons */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Filter className="h-4 w-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">서적별 필터</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant={!bookIdFilter ? "default" : "outline"}
+                size="sm"
+                onClick={clearBookFilter}
+                className="text-xs"
+              >
+                전체
+              </Button>
+              {booksWithDiscussions.map((book) => (
+                <Button
+                  key={book.id}
+                  variant={bookIdFilter === book.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setBookFilter(book.id)}
+                  className="text-xs"
+                >
+                  {book.title}
+                </Button>
+              ))}
+            </div>
+          </div>
           
           {/* Search */}
           <div className="relative">

@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -85,31 +86,33 @@ const MyPage = () => {
               </Card>
             ) : (
               myDiscussions.map((discussion) => (
-                <Card key={discussion.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg mb-2">
-                          {discussion.title}
-                        </CardTitle>
-                        <Badge variant="outline" className="mb-2">
-                          {getBookTitle(discussion.bookId)}
-                        </Badge>
+                <Link key={discussion.id} to={`/discussions/${discussion.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg mb-2">
+                            {discussion.title}
+                          </CardTitle>
+                          <Badge variant="outline" className="mb-2">
+                            {getBookTitle(discussion.bookId)}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-gray-500 ml-4">
+                          좋아요 {discussion.likes}개
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500 ml-4">
-                        좋아요 {discussion.likes}개
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-gray-600 line-clamp-2 mb-3">
+                        {discussion.content}
+                      </p>
+                      <div className="text-sm text-gray-500">
+                        {new Date(discussion.createdAt).toLocaleDateString()}
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-gray-600 line-clamp-2 mb-3">
-                      {discussion.content}
-                    </p>
-                    <div className="text-sm text-gray-500">
-                      {new Date(discussion.createdAt).toLocaleDateString()}
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))
             )}
           </TabsContent>
@@ -123,32 +126,34 @@ const MyPage = () => {
               </Card>
             ) : (
               participatedDiscussions.map((discussion) => (
-                <Card key={discussion.id} className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg mb-2">
-                          {discussion.title}
-                        </CardTitle>
-                        <Badge variant="outline" className="mb-2">
-                          {getBookTitle(discussion.bookId)}
-                        </Badge>
+                <Link key={discussion.id} to={`/discussions/${discussion.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-lg mb-2">
+                            {discussion.title}
+                          </CardTitle>
+                          <Badge variant="outline" className="mb-2">
+                            {getBookTitle(discussion.bookId)}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-gray-500 ml-4">
+                          좋아요 {discussion.likes}개
+                        </div>
                       </div>
-                      <div className="text-sm text-gray-500 ml-4">
-                        좋아요 {discussion.likes}개
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-gray-600 line-clamp-2 mb-3">
+                        {discussion.content}
+                      </p>
+                      <div className="flex justify-between items-center text-sm text-gray-500">
+                        <span>작성자: {discussion.author}</span>
+                        <span>{new Date(discussion.createdAt).toLocaleDateString()}</span>
                       </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-gray-600 line-clamp-2 mb-3">
-                      {discussion.content}
-                    </p>
-                    <div className="flex justify-between items-center text-sm text-gray-500">
-                      <span>작성자: {discussion.author}</span>
-                      <span>{new Date(discussion.createdAt).toLocaleDateString()}</span>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))
             )}
           </TabsContent>
