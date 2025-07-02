@@ -8,15 +8,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ChevronDown, Heart } from 'lucide-react';
 import Header from '../components/Header';
-import { mockBooks, mockDiscussions, mockUser } from '../data/mockData';
+import { mockBooks, mockDiscussions } from '../data/mockData';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [priceListOpen, setPriceListOpen] = useState(false);
   
   const book = mockBooks.find(b => b.id === id);
   const bookDiscussions = mockDiscussions.filter(d => d.bookId === id);
-  const isPurchased = mockUser.purchasedBooks.includes(id || '');
+  const isPurchased = user?.purchasedBooks.includes(id || '') || false;
   
   if (!book) {
     return <div>Book not found</div>;
@@ -25,6 +28,21 @@ const BookDetail = () => {
   const minPrice = Math.min(...book.prices.map(p => p.price));
   const sortedPrices = [...book.prices].sort((a, b) => a.price - b.price);
   const topDiscussions = bookDiscussions.slice(0, 5);
+
+  const handlePurchase = () => {
+    if (!user) {
+      toast.error('로그인이 필요합니다.');
+      return;
+    }
+
+    // 구매 처리 로직 (실제로는 결제 API 호출)
+    toast.success('구매가 완료되었습니다.');
+    
+    // 사용자의 구매 목록에 추가 (실제로는 서버에서 처리)
+    if (user && id) {
+      user.purchasedBooks.push(id);
+    }
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,7 +85,7 @@ const BookDetail = () => {
               <div className="flex gap-4">
                 {!isPurchased ? (
                   <>
-                    <Button size="lg" className="flex-1">
+                    <Button size="lg" className="flex-1" onClick={handlePurchase}>
                       구매하기
                     </Button>
                     <Dialog>
@@ -122,7 +140,7 @@ const BookDetail = () => {
                            price.condition === 'good' ? '양호' : '보통'} · {price.sellerName}
                         </p>
                       </div>
-                      <Button size="sm">구매</Button>
+                      <Button size="sm" onClick={handlePurchase}>구매</Button>
                     </div>
                   ))}
                 </div>
