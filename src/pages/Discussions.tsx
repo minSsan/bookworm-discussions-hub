@@ -1,26 +1,35 @@
 
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Search, MessageSquare } from 'lucide-react';
+import { Search, MessageSquare, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
 import { mockDiscussions, mockBooks } from '../data/mockData';
 
 const ITEMS_PER_PAGE = 10;
 
 const Discussions = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  
+  const bookIdFilter = searchParams.get('bookId');
   
   // Sort discussions by date (newest first)
   const sortedDiscussions = [...mockDiscussions].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
   
-  const filteredDiscussions = sortedDiscussions.filter(discussion => 
+  // Filter by bookId if specified
+  const bookFilteredDiscussions = bookIdFilter 
+    ? sortedDiscussions.filter(discussion => discussion.bookId === bookIdFilter)
+    : sortedDiscussions;
+  
+  const filteredDiscussions = bookFilteredDiscussions.filter(discussion => 
     discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     discussion.author.toLowerCase().includes(searchTerm.toLowerCase())
@@ -34,6 +43,18 @@ const Discussions = () => {
     const book = mockBooks.find(b => b.id === bookId);
     return book?.title || '알 수 없는 도서';
   };
+
+  const filteredBook = bookIdFilter ? mockBooks.find(b => b.id === bookIdFilter) : null;
+
+  const clearBookFilter = () => {
+    setSearchParams({});
+    setCurrentPage(1);
+  };
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [bookIdFilter, searchTerm]);
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,6 +66,25 @@ const Discussions = () => {
           <p className="text-gray-600 mb-6">
             개발 서적에 대한 다양한 토론에 참여해보세요
           </p>
+
+          {/* Book Filter Display */}
+          {filteredBook && (
+            <div className="mb-4">
+              <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <span className="text-sm text-blue-700">
+                  <strong>{filteredBook.title}</strong> 관련 토론
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearBookFilter}
+                  className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
           
           {/* Search */}
           <div className="relative">
@@ -95,7 +135,9 @@ const Discussions = () => {
         
         {filteredDiscussions.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">검색 결과가 없습니다.</p>
+            <p className="text-gray-500">
+              {bookIdFilter ? '해당 서적에 대한 토론이 없습니다.' : '검색 결과가 없습니다.'}
+            </p>
           </div>
         )}
         

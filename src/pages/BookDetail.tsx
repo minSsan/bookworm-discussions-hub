@@ -105,7 +105,7 @@ const BookDetail = () => {
                     </Dialog>
                   </>
                 ) : (
-                  <Link to={`/books/${book.id}/discussions`} className="flex-1">
+                  <Link to={`/discussions?bookId=${book.id}`} className="flex-1">
                     <Button size="lg" className="w-full">
                       토론 참여하기
                     </Button>
