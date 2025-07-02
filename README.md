@@ -1,6 +1,6 @@
 # 주제: 개발자를 위한 도서 구매 서비스
 
-> [프로토타입 웹 사이트]([https://enjoydevbooks.netlify.app/](https://bookworm-discussions-hub.lovable.app/))
+> [프로토타입 웹 사이트](https://bookworm-discussions-hub.lovable.app/)
 
 ## 테스트 계정 정보
 
