@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +22,53 @@ const DiscussionDetail = () => {
   const discussion = mockDiscussions.find(d => d.id === id);
   const book = discussion ? mockBooks.find(b => b.id === discussion.bookId) : null;
   
+  // Redirect to home if not logged in
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+  
   if (!discussion || !book) {
-    return <div>토론을 찾을 수 없습니다.</div>;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <p className="text-gray-500">토론을 찾을 수 없습니다.</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Check if user has purchased the book
+  const hasPurchasedBook = user.purchasedBooks.includes(discussion.bookId);
+  
+  if (!hasPurchasedBook) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <Link to="/discussions" className="inline-flex items-center text-blue-600 hover:text-blue-800">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              토론 목록으로 돌아가기
+            </Link>
+          </div>
+          
+          <Card>
+            <CardContent className="py-12 text-center">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">접근 권한이 없습니다</h2>
+              <p className="text-gray-600 mb-6">
+                이 토론에 참여하려면 <strong>{book.title}</strong> 도서를 구매해야 합니다.
+              </p>
+              <Link to={`/books/${book.id}`}>
+                <Button>도서 구매하기</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
   }
 
   useState(() => {
@@ -32,22 +77,12 @@ const DiscussionDetail = () => {
   });
 
   const handleLike = () => {
-    if (!user) {
-      toast.error('로그인이 필요합니다.');
-      return;
-    }
-    
     setIsLiked(!isLiked);
     setLikes(isLiked ? likes - 1 : likes + 1);
     toast.success(isLiked ? '좋아요를 취소했습니다.' : '좋아요를 추가했습니다.');
   };
 
   const handleAddComment = () => {
-    if (!user) {
-      toast.error('로그인이 필요합니다.');
-      return;
-    }
-    
     if (!newComment.trim()) {
       toast.error('댓글 내용을 입력해주세요.');
       return;
