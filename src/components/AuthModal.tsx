@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -15,6 +16,7 @@ interface AuthModalProps {
 
 const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
   const [isLoginMode, setIsLoginMode] = useState(mode === 'login');
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -52,6 +54,7 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
 
   const resetForm = () => {
     setFormData({ name: '', email: '', password: '' });
+    setShowPassword(false);
   };
 
   const toggleMode = () => {
@@ -93,13 +96,29 @@ const AuthModal = ({ isOpen, onClose, mode }: AuthModalProps) => {
           
           <div>
             <Label htmlFor="password">비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                required
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-400" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-400" />
+                )}
+              </Button>
+            </div>
           </div>
           
           <div className="flex flex-col space-y-2">

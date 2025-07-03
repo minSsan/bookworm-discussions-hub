@@ -1,14 +1,15 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { User, BookOpen, MessageSquare } from 'lucide-react';
 import Header from '../components/Header';
-import { mockUser, mockDiscussions, mockBooks } from '../data/mockData';
+import { mockUser, mockDiscussions, mockBooks, mockChapters } from '../data/mockData';
 
 const MyPage = () => {
+  const navigate = useNavigate();
   const user = mockUser;
   
   // Get user's discussions
@@ -20,6 +21,15 @@ const MyPage = () => {
   const getBookTitle = (bookId: string) => {
     const book = mockBooks.find(b => b.id === bookId);
     return book?.title || '알 수 없는 도서';
+  };
+
+  const getChapterTitle = (chapterId: string) => {
+    const chapter = mockChapters.find(c => c.id === chapterId);
+    return chapter?.title || '';
+  };
+
+  const handleDiscussionClick = (discussionId: string) => {
+    navigate(`/discussions/${discussionId}`);
   };
   
   return (
@@ -86,33 +96,42 @@ const MyPage = () => {
               </Card>
             ) : (
               myDiscussions.map((discussion) => (
-                <Link key={discussion.id} to={`/discussions/${discussion.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg mb-2">
-                            {discussion.title}
-                          </CardTitle>
-                          <Badge variant="outline" className="mb-2">
+                <Card 
+                  key={discussion.id} 
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleDiscussionClick(discussion.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg mb-2">
+                          {discussion.title}
+                        </CardTitle>
+                        <div className="flex gap-2 mb-2">
+                          <Badge variant="outline">
                             {getBookTitle(discussion.bookId)}
                           </Badge>
-                        </div>
-                        <div className="text-sm text-gray-500 ml-4">
-                          좋아요 {discussion.likes}개
+                          {discussion.chapterId && (
+                            <Badge variant="secondary">
+                              {getChapterTitle(discussion.chapterId)}
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-gray-600 line-clamp-2 mb-3">
-                        {discussion.content}
-                      </p>
-                      <div className="text-sm text-gray-500">
-                        {new Date(discussion.createdAt).toLocaleDateString()}
+                      <div className="text-sm text-gray-500 ml-4">
+                        좋아요 {discussion.likes}개
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-gray-600 line-clamp-2 mb-3">
+                      {discussion.content}
+                    </p>
+                    <div className="text-sm text-gray-500">
+                      {new Date(discussion.createdAt).toLocaleDateString()}
+                    </div>
+                  </CardContent>
+                </Card>
               ))
             )}
           </TabsContent>
@@ -126,34 +145,43 @@ const MyPage = () => {
               </Card>
             ) : (
               participatedDiscussions.map((discussion) => (
-                <Link key={discussion.id} to={`/discussions/${discussion.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg mb-2">
-                            {discussion.title}
-                          </CardTitle>
-                          <Badge variant="outline" className="mb-2">
+                <Card 
+                  key={discussion.id} 
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => handleDiscussionClick(discussion.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-lg mb-2">
+                          {discussion.title}
+                        </CardTitle>
+                        <div className="flex gap-2 mb-2">
+                          <Badge variant="outline">
                             {getBookTitle(discussion.bookId)}
                           </Badge>
-                        </div>
-                        <div className="text-sm text-gray-500 ml-4">
-                          좋아요 {discussion.likes}개
+                          {discussion.chapterId && (
+                            <Badge variant="secondary">
+                              {getChapterTitle(discussion.chapterId)}
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-gray-600 line-clamp-2 mb-3">
-                        {discussion.content}
-                      </p>
-                      <div className="flex justify-between items-center text-sm text-gray-500">
-                        <span>작성자: {discussion.author}</span>
-                        <span>{new Date(discussion.createdAt).toLocaleDateString()}</span>
+                      <div className="text-sm text-gray-500 ml-4">
+                        좋아요 {discussion.likes}개
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-gray-600 line-clamp-2 mb-3">
+                      {discussion.content}
+                    </p>
+                    <div className="flex justify-between items-center text-sm text-gray-500">
+                      <span>작성자: {discussion.author}</span>
+                      <span>{new Date(discussion.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </CardContent>
+                </Card>
               ))
             )}
           </TabsContent>

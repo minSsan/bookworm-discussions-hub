@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ChevronDown, Heart } from 'lucide-react';
 import Header from '../components/Header';
 import { mockBooks, mockDiscussions } from '../data/mockData';
@@ -19,7 +18,6 @@ const BookDetail = () => {
   
   const book = mockBooks.find(b => b.id === id);
   const bookDiscussions = mockDiscussions.filter(d => d.bookId === id);
-  const isPurchased = user?.purchasedBooks.includes(id || '') || false;
   
   if (!book) {
     return <div>Book not found</div>;
@@ -83,34 +81,14 @@ const BookDetail = () => {
               </div>
               
               <div className="flex gap-4">
-                {!isPurchased ? (
-                  <>
-                    <Button size="lg" className="flex-1" onClick={handlePurchase}>
-                      구매하기
-                    </Button>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="lg" className="flex-1">
-                          구매 인증하기
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>구매 인증</DialogTitle>
-                        </DialogHeader>
-                        <p className="text-center py-8 text-gray-600">
-                          준비중인 기능입니다.
-                        </p>
-                      </DialogContent>
-                    </Dialog>
-                  </>
-                ) : (
-                  <Link to={`/discussions?bookId=${book.id}`} className="flex-1">
-                    <Button size="lg" className="w-full">
-                      토론 참여하기
-                    </Button>
-                  </Link>
-                )}
+                <Button size="lg" className="flex-1" onClick={handlePurchase}>
+                  구매하기
+                </Button>
+                <Link to={`/discussions?bookId=${book.id}`} className="flex-1">
+                  <Button variant="outline" size="lg" className="w-full">
+                    토론 참여하기
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -159,12 +137,11 @@ const BookDetail = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {topDiscussions.map((discussion, index) => (
-                <div 
+              {topDiscussions.map((discussion) => (
+                <Link 
                   key={discussion.id} 
-                  className={`p-4 border rounded-lg ${
-                    !isPurchased && index > 0 ? 'filter blur-sm bg-gray-100' : 'hover:bg-gray-50 cursor-pointer'
-                  }`}
+                  to={`/discussions/${discussion.id}`}
+                  className="block p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
                 >
                   <h3 className="font-medium mb-2">{discussion.title}</h3>
                   <p className="text-sm text-gray-600 line-clamp-2 mb-2">
@@ -174,14 +151,8 @@ const BookDetail = () => {
                     <span>{discussion.author}</span>
                     <span>좋아요 {discussion.likes}개</span>
                   </div>
-                </div>
+                </Link>
               ))}
-              
-              {!isPurchased && (
-                <div className="text-center py-4 text-gray-500">
-                  <p>더 많은 토론을 보려면 책을 구매해주세요.</p>
-                </div>
-              )}
             </div>
           </CardContent>
         </Card>

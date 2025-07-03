@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Heart, MessageSquare, ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
-import { mockDiscussions, mockBooks } from '../data/mockData';
+import { mockDiscussions, mockBooks, mockChapters } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -21,6 +21,7 @@ const DiscussionDetail = () => {
   
   const discussion = mockDiscussions.find(d => d.id === id);
   const book = discussion ? mockBooks.find(b => b.id === discussion.bookId) : null;
+  const chapter = discussion?.chapterId ? mockChapters.find(c => c.id === discussion.chapterId) : null;
   
   // Redirect to home if not logged in
   if (!user) {
@@ -35,37 +36,6 @@ const DiscussionDetail = () => {
           <div className="text-center py-12">
             <p className="text-gray-500">토론을 찾을 수 없습니다.</p>
           </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Check if user has purchased the book
-  const hasPurchasedBook = user.purchasedBooks.includes(discussion.bookId);
-  
-  if (!hasPurchasedBook) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-6">
-            <Link to="/discussions" className="inline-flex items-center text-blue-600 hover:text-blue-800">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              토론 목록으로 돌아가기
-            </Link>
-          </div>
-          
-          <Card>
-            <CardContent className="py-12 text-center">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">접근 권한이 없습니다</h2>
-              <p className="text-gray-600 mb-6">
-                이 토론에 참여하려면 <strong>{book.title}</strong> 도서를 구매해야 합니다.
-              </p>
-              <Link to={`/books/${book.id}`}>
-                <Button>도서 구매하기</Button>
-              </Link>
-            </CardContent>
-          </Card>
         </main>
       </div>
     );
@@ -119,9 +89,16 @@ const DiscussionDetail = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <CardTitle className="text-2xl mb-4">{discussion.title}</CardTitle>
-                <Badge variant="outline" className="mb-4">
-                  {book.title}
-                </Badge>
+                <div className="flex gap-2 mb-4">
+                  <Badge variant="outline">
+                    {book.title}
+                  </Badge>
+                  {chapter && (
+                    <Badge variant="secondary">
+                      {chapter.title}
+                    </Badge>
+                  )}
+                </div>
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <span>{discussion.author}</span>
                   <span>{new Date(discussion.createdAt).toLocaleDateString()}</span>

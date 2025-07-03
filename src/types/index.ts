@@ -10,6 +10,13 @@ export interface Book {
   prices: BookPrice[];
   purchased: boolean;
   likes: number;
+  chapters: Chapter[];
+}
+
+export interface Chapter {
+  id: string;
+  title: string;
+  bookId: string;
 }
 
 export interface BookPrice {
@@ -23,6 +30,7 @@ export interface BookPrice {
 export interface Discussion {
   id: string;
   bookId: string;
+  chapterId?: string;
   title: string;
   content: string;
   author: string;

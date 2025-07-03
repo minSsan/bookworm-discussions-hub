@@ -1,30 +1,28 @@
+
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Search, MessageSquare, X, Filter } from 'lucide-react';
+import { Search, MessageSquare, X, Filter, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
-import LoginRequired from '../components/LoginRequired';
-import { mockDiscussions, mockBooks } from '../data/mockData';
+import { mockDiscussions, mockBooks, mockChapters } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 10;
 
 const Discussions = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Render LoginRequired component if not logged in
-  if (!user) {
-    return <LoginRequired />;
-  }
-  
   const bookIdFilter = searchParams.get('bookId');
+  const chapterIdFilter = searchParams.get('chapterId');
   
   // Sort discussions by date (newest first)
   const sortedDiscussions = [...mockDiscussions].sort(
@@ -32,28 +30,37 @@ const Discussions = () => {
   );
   
   // Filter by bookId if specified
-  const bookFilteredDiscussions = bookIdFilter 
+  let filteredDiscussions = bookIdFilter 
     ? sortedDiscussions.filter(discussion => discussion.bookId === bookIdFilter)
     : sortedDiscussions;
+    
+  // Filter by chapterId if specified
+  if (chapterIdFilter) {
+    filteredDiscussions = filteredDiscussions.filter(discussion => discussion.chapterId === chapterIdFilter);
+  }
   
-  const filteredDiscussions = bookFilteredDiscussions.filter(discussion => 
+  // Filter by search term
+  const searchFilteredDiscussions = filteredDiscussions.filter(discussion => 
     discussion.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     discussion.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
     discussion.author.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  const totalPages = Math.ceil(filteredDiscussions.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(searchFilteredDiscussions.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedDiscussions = filteredDiscussions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedDiscussions = searchFilteredDiscussions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   
   const getBookTitle = (bookId: string) => {
     const book = mockBooks.find(b => b.id === bookId);
     return book?.title || '알 수 없는 도서';
   };
 
-  const filteredBook = bookIdFilter ? mockBooks.find(b => b.id === bookIdFilter) : null;
+  const getChapterTitle = (chapterId: string) => {
+    const chapter = mockChapters.find(c => c.id === chapterId);
+    return chapter?.title || '';
+  };
 
-  const clearBookFilter = () => {
+  const clearAllFilters = () => {
     setSearchParams({});
     setCurrentPage(1);
   };
@@ -63,15 +70,44 @@ const Discussions = () => {
     setCurrentPage(1);
   };
 
+  const setChapterFilter = (chapterId: string) => {
+    const chapter = mockChapters.find(c => c.id === chapterId);
+    if (chapter) {
+      setSearchParams({ bookId: chapter.bookId, chapterId });
+    }
+    setCurrentPage(1);
+  };
+
   // Get unique books that have discussions
   const booksWithDiscussions = mockBooks.filter(book => 
     mockDiscussions.some(discussion => discussion.bookId === book.id)
   );
 
+  // Get chapters for the selected book
+  const chaptersForSelectedBook = bookIdFilter 
+    ? mockChapters.filter(c => c.bookId === bookIdFilter && mockDiscussions.some(d => d.chapterId === c.id))
+    : [];
+
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [bookIdFilter, searchTerm]);
+  }, [bookIdFilter, chapterIdFilter, searchTerm]);
+
+  const handleDiscussionClick = (discussionId: string) => {
+    if (!user) {
+      toast.error('게시글을 보려면 로그인이 필요합니다.');
+      return;
+    }
+    navigate(`/discussions/${discussionId}`);
+  };
+
+  const handleCreateDiscussion = () => {
+    if (!user) {
+      toast.error('게시글을 작성하려면 로그인이 필요합니다.');
+      return;
+    }
+    navigate('/discussions/create');
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -79,29 +115,16 @@ const Discussions = () => {
       
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">토론 게시판</h1>
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold text-gray-900">토론 게시판</h1>
+            <Button onClick={handleCreateDiscussion}>
+              <Plus className="h-4 w-4 mr-2" />
+              작성하기
+            </Button>
+          </div>
           <p className="text-gray-600 mb-6">
             개발 서적에 대한 다양한 토론에 참여해보세요
           </p>
-
-          {/* Book Filter Display */}
-          {filteredBook && (
-            <div className="mb-4">
-              <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <span className="text-sm text-blue-700">
-                  <strong>{filteredBook.title}</strong> 관련 토론
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearBookFilter}
-                  className="h-6 w-6 p-0 text-blue-600 hover:text-blue-800"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          )}
 
           {/* Book Filter Buttons */}
           <div className="mb-6">
@@ -113,7 +136,7 @@ const Discussions = () => {
               <Button
                 variant={!bookIdFilter ? "default" : "outline"}
                 size="sm"
-                onClick={clearBookFilter}
+                onClick={clearAllFilters}
                 className="text-xs"
               >
                 전체
@@ -131,6 +154,37 @@ const Discussions = () => {
               ))}
             </div>
           </div>
+
+          {/* Chapter Filter Buttons */}
+          {bookIdFilter && chaptersForSelectedBook.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Filter className="h-4 w-4 text-gray-600" />
+                <span className="text-sm font-medium text-gray-700">챕터별 필터</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant={!chapterIdFilter ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSearchParams({ bookId: bookIdFilter })}
+                  className="text-xs"
+                >
+                  전체 챕터
+                </Button>
+                {chaptersForSelectedBook.map((chapter) => (
+                  <Button
+                    key={chapter.id}
+                    variant={chapterIdFilter === chapter.id ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setChapterFilter(chapter.id)}
+                    className="text-xs"
+                  >
+                    {chapter.title}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
           
           {/* Search */}
           <div className="relative">
@@ -148,16 +202,23 @@ const Discussions = () => {
         <div className="space-y-4 mb-8">
           {paginatedDiscussions.map((discussion) => (
             <Card key={discussion.id} className="hover:shadow-md transition-shadow cursor-pointer">
-              <Link to={`/discussions/${discussion.id}`}>
+              <div onClick={() => handleDiscussionClick(discussion.id)}>
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg mb-2 line-clamp-2">
                         {discussion.title}
                       </CardTitle>
-                      <Badge variant="outline" className="mb-2">
-                        {getBookTitle(discussion.bookId)}
-                      </Badge>
+                      <div className="flex gap-2 mb-2">
+                        <Badge variant="outline">
+                          {getBookTitle(discussion.bookId)}
+                        </Badge>
+                        {discussion.chapterId && (
+                          <Badge variant="secondary">
+                            {getChapterTitle(discussion.chapterId)}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <div className="flex items-center text-sm text-gray-500 ml-4">
                       <MessageSquare className="h-4 w-4 mr-1" />
@@ -167,22 +228,24 @@ const Discussions = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <p className="text-gray-600 line-clamp-2 mb-3">
-                    {discussion.content}
+                    {discussion.content.length > 100 
+                      ? discussion.content.substring(0, 100) + '...' 
+                      : discussion.content}
                   </p>
                   <div className="flex justify-between items-center text-sm text-gray-500">
                     <span>{discussion.author}</span>
                     <span>{new Date(discussion.createdAt).toLocaleDateString()}</span>
                   </div>
                 </CardContent>
-              </Link>
+              </div>
             </Card>
           ))}
         </div>
         
-        {filteredDiscussions.length === 0 && (
+        {searchFilteredDiscussions.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">
-              {bookIdFilter ? '해당 서적에 대한 토론이 없습니다.' : '검색 결과가 없습니다.'}
+              {bookIdFilter || chapterIdFilter ? '해당 조건의 토론이 없습니다.' : '검색 결과가 없습니다.'}
             </p>
           </div>
         )}
