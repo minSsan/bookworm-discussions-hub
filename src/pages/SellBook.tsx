@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Header from '../components/Header';
+import AuthModal from '../components/AuthModal';
 import { mockBooks } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 
 const SellBook = () => {
   const { user } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(!user);
   const [formData, setFormData] = useState({
     bookId: '',
     price: '',
@@ -25,7 +27,7 @@ const SellBook = () => {
     e.preventDefault();
     
     if (!user) {
-      toast.error('로그인이 필요합니다.');
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -56,20 +58,13 @@ const SellBook = () => {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-gray-500">로그인이 필요합니다.</p>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
-    );
-  }
+  const handleAuthModalClose = () => {
+    if (!user) {
+      window.location.href = '/';
+    } else {
+      setIsAuthModalOpen(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -165,6 +160,12 @@ const SellBook = () => {
           </CardContent>
         </Card>
       </main>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={handleAuthModalClose}
+        mode="login"
+      />
     </div>
   );
 };

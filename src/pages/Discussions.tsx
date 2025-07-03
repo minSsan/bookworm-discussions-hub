@@ -8,9 +8,9 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Search, MessageSquare, X, Filter, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
+import AuthModal from '../components/AuthModal';
 import { mockDiscussions, mockBooks, mockChapters } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -20,6 +20,7 @@ const Discussions = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   const bookIdFilter = searchParams.get('bookId');
   const chapterIdFilter = searchParams.get('chapterId');
@@ -95,7 +96,7 @@ const Discussions = () => {
 
   const handleDiscussionClick = (discussionId: string) => {
     if (!user) {
-      toast.error('게시글을 보려면 로그인이 필요합니다.');
+      setIsAuthModalOpen(true);
       return;
     }
     navigate(`/discussions/${discussionId}`);
@@ -103,10 +104,14 @@ const Discussions = () => {
 
   const handleCreateDiscussion = () => {
     if (!user) {
-      toast.error('게시글을 작성하려면 로그인이 필요합니다.');
+      setIsAuthModalOpen(true);
       return;
     }
     navigate('/discussions/create');
+  };
+
+  const handleAuthModalClose = () => {
+    setIsAuthModalOpen(false);
   };
   
   return (
@@ -290,6 +295,12 @@ const Discussions = () => {
           </Pagination>
         )}
       </main>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={handleAuthModalClose}
+        mode="login"
+      />
     </div>
   );
 };

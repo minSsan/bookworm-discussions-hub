@@ -29,12 +29,14 @@ const Index = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            개발 서적과 함께하는 성장
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            개발 서적을 구매하고, 다양한 개발자들과 토론하며 함께 성장하세요
-          </p>
+          <div className="bg-gradient-to-r from-blue-500 to-blue-700 rounded-xl p-8 mb-8 text-white">
+            <h1 className="text-4xl font-bold mb-4">
+              개발 서적과 함께하는 성장
+            </h1>
+            <p className="text-xl">
+              관심있는 개발 서적으로 다양한 개발자들과 토론하며 함께 성장하세요
+            </p>
+          </div>
         </div>
         
         {/* Search and Filter */}

@@ -13,7 +13,7 @@ const BookCard = ({ book }: BookCardProps) => {
   
   return (
     <Link to={`/books/${book.id}`}>
-      <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
+      <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-2 cursor-pointer">
         <CardHeader className="pb-3">
           <div className="aspect-[3/4] bg-gray-100 rounded-md mb-4 flex items-center justify-center">
             <img 
