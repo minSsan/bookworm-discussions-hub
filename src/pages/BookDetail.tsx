@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, Heart } from 'lucide-react';
 import Header from '../components/Header';
+import AuthModal from '../components/AuthModal';
 import { mockBooks, mockDiscussions } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [priceListOpen, setPriceListOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   
   const book = mockBooks.find(b => b.id === id);
   const bookDiscussions = mockDiscussions.filter(d => d.bookId === id);
@@ -29,7 +31,7 @@ const BookDetail = () => {
 
   const handlePurchase = () => {
     if (!user) {
-      toast.error('로그인이 필요합니다.');
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -40,6 +42,10 @@ const BookDetail = () => {
     if (user && id) {
       user.purchasedBooks.push(id);
     }
+  };
+
+  const handleAuthModalClose = () => {
+    setIsAuthModalOpen(false);
   };
   
   return (
@@ -157,6 +163,12 @@ const BookDetail = () => {
           </CardContent>
         </Card>
       </main>
+
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={handleAuthModalClose}
+        mode="login"
+      />
     </div>
   );
 };
