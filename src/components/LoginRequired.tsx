@@ -46,6 +46,7 @@ const LoginRequired = () => {
       <AuthModal 
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        mode="login"
       />
     </div>
   );
