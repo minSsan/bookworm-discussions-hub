@@ -7,7 +7,7 @@ export const mockBooks: Book[] = [
     title: '클린 아키텍처',
     author: '로버트 C. 마틴',
     description: '소프트웨어 구조와 설계의 원칙을 다루는 필수 도서',
-    coverImage: '/placeholder.svg',
+    coverImage: 'https://image.yes24.com/goods/77283734/XL',
     publishYear: 2017,
     categories: ['아키텍처', '설계'],
     prices: [
@@ -23,7 +23,7 @@ export const mockBooks: Book[] = [
     title: '리팩토링 2판',
     author: '마틴 파울러',
     description: '코드 구조를 체계적으로 개선하는 기법과 패턴',
-    coverImage: '/placeholder.svg',
+    coverImage: 'https://image.yes24.com/goods/89649360/XL',
     publishYear: 2019,
     categories: ['리팩토링', '코드품질'],
     prices: [
@@ -38,7 +38,7 @@ export const mockBooks: Book[] = [
     title: '모던 자바스크립트 Deep Dive',
     author: '이웅모',
     description: 'JavaScript의 핵심 개념과 동작 원리를 깊이 있게 다루는 책',
-    coverImage: '/placeholder.svg',
+    coverImage: 'https://image.yes24.com/goods/92742567/XL',
     publishYear: 2020,
     categories: ['JavaScript', '프론트엔드', '백엔드'],
     prices: [

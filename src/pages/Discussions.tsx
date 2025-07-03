@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams, Navigate } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +7,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { Search, MessageSquare, X, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Header from '../components/Header';
+import LoginRequired from '../components/LoginRequired';
 import { mockDiscussions, mockBooks } from '../data/mockData';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -19,9 +19,9 @@ const Discussions = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Redirect to home if not logged in
+  // Render LoginRequired component if not logged in
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <LoginRequired />;
   }
   
   const bookIdFilter = searchParams.get('bookId');
